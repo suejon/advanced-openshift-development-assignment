@@ -20,12 +20,19 @@ echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Gr
 # To be Implemented by Student
 
 # delete + create blue services (w/o labels)
-oc delete svc mlb-parks-green -n ${GUID}-parks-prod
-oc delete svc national-parks-green -n ${GUID}-parks-prod
-
+echo "Removing labels from blue services so they are no longer used as active backends"
+oc delete svc mlb-parks-blue -n ${GUID}-parks-prod
+oc delete svc national-parks-blue -n ${GUID}-parks-prod
 oc create -f ../templates/parks-prod/mlb-parks-blue-svc.yaml -n ${GUID}-parks-prod
 oc create -f ../templates/parks-prod/national-parks-blue-svc.yaml -n ${GUID}-parks-prod
 
+# Switch parks-map route to point back to green
+echo "Directing traffic back to green deployments"
+oc patch route mlb-parks --patch='{"spec":{"to":{"name": "mlb-parks-green"}}}' -n ${GUID}-parks-prod
+oc patch route national-parks --patch='{"spec":{"to":{"name": "national-parks-green"}}}' -n ${GUID}-parks-prod
+oc patch route parks-map --patch='{"spec":{"to":{"name": "parks-map-green"}}}' -n ${GUID}-parks-prod
+
 # label green services with correct labels: app and type
+echo "Label the green services as the active backends"
 oc label svc mlb-parks-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod
 oc label svc national-parks-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod
