@@ -1,0 +1,283 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: jenkins_template.yaml
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      template.alpha.openshift.io/wait-for-ready: "true"
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: jenkins-persistent
+      template: jenkins-persistent-template
+    name: jenkins
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      name: jenkins
+    strategy:
+      activeDeadlineSeconds: 21600
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          name: jenkins
+      spec:
+        containers:
+        - env:
+          - name: OPENSHIFT_ENABLE_OAUTH
+            value: "true"
+          - name: OPENSHIFT_ENABLE_REDIRECT_PROMPT
+            value: "true"
+          - name: KUBERNETES_MASTER
+            value: https://kubernetes.default:443
+          - name: KUBERNETES_TRUST_CERTIFICATES
+            value: "true"
+          - name: JENKINS_SERVICE_NAME
+            value: jenkins
+          - name: JNLP_SERVICE_NAME
+            value: jenkins-jnlp
+          image: registry.access.redhat.com/openshift3/jenkins-2-rhel7@sha256:1a5877a002240e5ef7d4f53cbdc1fff8107c6574a4040f6bdbfab0341aecfd86
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /login
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 420
+            periodSeconds: 360
+            successThreshold: 1
+            timeoutSeconds: 240
+          name: jenkins
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /login
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 240
+          resources:
+            limits:
+              memory: 2Gi
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/jenkins
+            name: jenkins-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: jenkins
+        serviceAccountName: jenkins
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - jenkins
+        from:
+          kind: ImageStreamTag
+          name: jenkins:2
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+    creationTimestamp: null
+    labels:
+      app: jenkins-persistent
+      template: jenkins-persistent-template
+    name: jenkins
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 4Gi
+    volumeName: vol376
+  status: {}
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.completed-at: 2018-07-18 03:07:32 +0000 UTC
+      openshift.io/deployer-pod.created-at: 2018-07-18 03:03:02 +0000 UTC
+      openshift.io/deployer-pod.name: jenkins-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: jenkins
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/deployment.status-reason: config change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"jenkins","namespace":"js-jenkins","selfLink":"/apis/apps.openshift.io/v1/namespaces/js-jenkins/deploymentconfigs/jenkins","uid":"1540e2f5-8a37-11e8-a6b1-06f5cce26774","resourceVersion":"872516","generation":2,"creationTimestamp":"2018-07-18T03:03:01Z","labels":{"app":"jenkins-persistent","template":"jenkins-persistent-template"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp","template.alpha.openshift.io/wait-for-ready":"true"}},"spec":{"strategy":{"type":"Recreate","recreateParams":{"timeoutSeconds":600},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["jenkins"],"from":{"kind":"ImageStreamTag","namespace":"openshift","name":"jenkins:2"},"lastTriggeredImage":"registry.access.redhat.com/openshift3/jenkins-2-rhel7@sha256:1a5877a002240e5ef7d4f53cbdc1fff8107c6574a4040f6bdbfab0341aecfd86"}},{"type":"ConfigChange"}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"name":"jenkins"},"template":{"metadata":{"creationTimestamp":null,"labels":{"name":"jenkins"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"jenkins-data","persistentVolumeClaim":{"claimName":"jenkins"}}],"containers":[{"name":"jenkins","image":"registry.access.redhat.com/openshift3/jenkins-2-rhel7@sha256:1a5877a002240e5ef7d4f53cbdc1fff8107c6574a4040f6bdbfab0341aecfd86","env":[{"name":"OPENSHIFT_ENABLE_OAUTH","value":"true"},{"name":"OPENSHIFT_ENABLE_REDIRECT_PROMPT","value":"true"},{"name":"KUBERNETES_MASTER","value":"https://kubernetes.default:443"},{"name":"KUBERNETES_TRUST_CERTIFICATES","value":"true"},{"name":"JENKINS_SERVICE_NAME","value":"jenkins"},{"name":"JNLP_SERVICE_NAME","value":"jenkins-jnlp"}],"resources":{"limits":{"memory":"2Gi"}},"volumeMounts":[{"name":"jenkins-data","mountPath":"/var/lib/jenkins"}],"livenessProbe":{"httpGet":{"path":"/login","port":8080,"scheme":"HTTP"},"initialDelaySeconds":420,"timeoutSeconds":240,"periodSeconds":360,"successThreshold":1,"failureThreshold":2},"readinessProbe":{"httpGet":{"path":"/login","port":8080,"scheme":"HTTP"},"initialDelaySeconds":3,"timeoutSeconds":240,"periodSeconds":10,"successThreshold":1,"failureThreshold":3},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"IfNotPresent","securityContext":{"capabilities":{},"privileged":false}}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","serviceAccountName":"jenkins","serviceAccount":"jenkins","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2018-07-18T03:03:01Z","lastTransitionTime":"2018-07-18T03:03:01Z","message":"Deployment config does not have minimum availability."}]}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: jenkins-persistent
+      openshift.io/deployment-config.name: jenkins
+      template: jenkins-persistent-template
+    name: jenkins-1
+  spec:
+    replicas: 1
+    selector:
+      deployment: jenkins-1
+      deploymentconfig: jenkins
+      name: jenkins
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: jenkins
+          openshift.io/deployment.name: jenkins-1
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          deployment: jenkins-1
+          deploymentconfig: jenkins
+          name: jenkins
+      spec:
+        containers:
+        - env:
+          - name: OPENSHIFT_ENABLE_OAUTH
+            value: "true"
+          - name: OPENSHIFT_ENABLE_REDIRECT_PROMPT
+            value: "true"
+          - name: KUBERNETES_MASTER
+            value: https://kubernetes.default:443
+          - name: KUBERNETES_TRUST_CERTIFICATES
+            value: "true"
+          - name: JENKINS_SERVICE_NAME
+            value: jenkins
+          - name: JNLP_SERVICE_NAME
+            value: jenkins-jnlp
+          image: registry.access.redhat.com/openshift3/jenkins-2-rhel7@sha256:1a5877a002240e5ef7d4f53cbdc1fff8107c6574a4040f6bdbfab0341aecfd86
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /login
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 420
+            periodSeconds: 360
+            successThreshold: 1
+            timeoutSeconds: 240
+          name: jenkins
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /login
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 240
+          resources:
+            limits:
+              memory: 2Gi
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/jenkins
+            name: jenkins-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: jenkins
+        serviceAccountName: jenkins
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      service.alpha.openshift.io/dependencies: '[{"name": "jenkins-jnlp", "namespace":
+        "", "kind": "Service"}]'
+      service.openshift.io/infrastructure: "true"
+    creationTimestamp: null
+    labels:
+      app: jenkins-persistent
+      template: jenkins-persistent-template
+    name: jenkins
+  spec:
+    ports:
+    - name: web
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      name: jenkins
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: jenkins-persistent
+      template: jenkins-persistent-template
+    name: jenkins-jnlp
+  spec:
+    ports:
+    - name: agent
+      port: 50000
+      protocol: TCP
+      targetPort: 50000
+    selector:
+      name: jenkins
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
