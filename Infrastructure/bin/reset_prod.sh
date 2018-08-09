@@ -18,3 +18,14 @@ echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Gr
 # rollout followed by a Green rollout.
 
 # To be Implemented by Student
+
+# delete + create blue services (w/o labels)
+oc delete svc mlb-parks-green -n ${GUID}-parks-prod
+oc delete svc national-parks-green -n ${GUID}-parks-prod
+
+oc create -f ../templates/parks-prod/mlb-parks-blue-svc.yaml -n ${GUID}-parks-prod
+oc create -f ../templates/parks-prod/national-parks-blue-svc.yaml -n ${GUID}-parks-prod
+
+# label green services with correct labels: app and type
+oc label svc mlb-parks-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod
+oc label svc national-parks-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod

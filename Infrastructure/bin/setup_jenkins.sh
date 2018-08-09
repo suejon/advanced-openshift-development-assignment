@@ -33,7 +33,7 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 oc new-app jenkins-persistent --name jenkins --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
 
 # create jenkins slave image with skopeo
-cat ../templates/Dockerfile | oc new-build --dockerfile=- --name=jenkins-slave-maven-appdev -n ${GUID}-jenkins
+cat ../templates/jenkins/Dockerfile | oc new-build --dockerfile=- --name=jenkins-slave-maven-appdev -n ${GUID}-jenkins
 # oc start-build jenkins-slave-maven-appdev -n ${GUID}-jenkins
 
 # set up 3 BCs that point to the pipelines located in source code

@@ -41,7 +41,6 @@ oc new-app ${GUID}-parks-dev/national-parks:0.0-0 --name=national-parks --allow-
 
 # set environmental variables for connecting to mongo db
 oc set env dc/mlb-parks DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-dev
-
 oc set env dc/national-parks DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-dev
 
 # configure mount path and apply configurationmaps to each service
@@ -71,7 +70,7 @@ oc set probe dc/national-parks --readiness --failure-threshold 3 --initial-delay
 
 # expose and label the services so the front end (parks-map) can find them
 oc expose dc parks-map --port 8080 -n ${GUID}-parks-dev
-oc expose svc parks-map --labels="" -n ${GUID}-parks-dev
+oc expose svc parks-map -n ${GUID}-parks-dev
 
 oc expose dc mlb-parks --port 8080 -n ${GUID}-parks-dev
 oc expose svc mlb-parks --labels="type=parksmap-backend" -n ${GUID}-parks-dev

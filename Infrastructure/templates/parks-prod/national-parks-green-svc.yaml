@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: national-parks-green
+  name: national-parks-green
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: national-parks-green
+    deploymentconfig: national-parks-green
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

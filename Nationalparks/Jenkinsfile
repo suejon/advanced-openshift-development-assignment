@@ -107,7 +107,9 @@ podTemplate(
         echo "Destination Application: " + destApp
 
         // Update the Image on the Production Deployment Config
+        sh "oc set image dc/${activeApp} ${activeApp}=docker-registry.default.svc:5000/${devNamespace}/national-parks:${prodTag} -n ${prodNamespace}"
         sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/${devNamespace}/national-parks:${prodTag} -n ${prodNamespace}"
+        
 
         // Update the Config Map which contains the users for the Tasks application
         sh "oc delete configmap ${destApp}-config -n ${prodNamespace} --ignore-not-found=true"
@@ -116,10 +118,19 @@ podTemplate(
         // label the green app as the backend (need to delete the service and recreate + label the blue to refresh the cache)
         sh "oc label svc national-parks-green type=parksmap-backend --overwrite -n ${prodNamespace}"
 
+        // Deploy the active application.
+        echo "Deploying " + activeApp
+        openshiftDeploy depCfg: activeApp, namespace: prodNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
+        openshiftVerifyDeployment depCfg: activeApp, namespace: prodNamespace, replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
+
         // Deploy the inactive application.
+        echo "Deploying " + destApp
         openshiftDeploy depCfg: destApp, namespace: prodNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
         openshiftVerifyDeployment depCfg: destApp, namespace: prodNamespace, replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
+
+        openshiftVerifyService namespace: prodNamespace, svcName: activeApp, verbose: 'false'
         openshiftVerifyService namespace: prodNamespace, svcName: destApp, verbose: 'false'
+        
     }
     
     stage('Switch over to new Version') {
@@ -127,11 +138,12 @@ podTemplate(
         input "Switch Production?"
         echo "Switching Production application to ${destApp}."
 
-        // delete old service, create new one with type=parksmap-backend so parks-map can find the correct service
-        sh "oc delete svc national-parks-green"
-        sh "oc label svc national-parks-blue type=parksmap-backend --overwrite -n ${prodNamespace}"
+        // recreate old service without label:type=parksmap-backend and move it to the destination app service to be discovered by parks-map
+        sh "oc delete svc national-parks-green -n ${prodNamespace}"
+        sh "oc create -f ../Infrastructure/templates/parks-prod/national-parks-green-svc.yaml -n ${prodNamespace}"
 
-        sh 'oc patch route national-parks -n ${prodNamespace} -p \'{"spec":{"to":{"name":"' + destApp + '"}}}\''
+        sh "oc label svc national-parks-blue type=parksmap-backend --overwrite -n ${prodNamespace}"
+        sh "oc patch route national-parks --patch=\'{\"spec\":{\"to\":{\"name\":\"${destApp}\"}}}\' -n ${prodNamespace}"
     }
   }
 }
