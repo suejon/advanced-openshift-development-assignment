@@ -127,7 +127,7 @@ podTemplate(
         openshiftDeploy depCfg: destApp, namespace: prodNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
         openshiftVerifyDeployment depCfg: destApp, namespace: prodNamespace, replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
 
-        openshiftVerifyService namespace: prodNamespace, svcName: active, verbose: 'false'
+        openshiftVerifyService namespace: prodNamespace, svcName: activeApp, verbose: 'false'
         openshiftVerifyService namespace: prodNamespace, svcName: destApp, verbose: 'false'
     }
     
@@ -139,7 +139,6 @@ podTemplate(
         // recreate old service without label:type=parksmap-backend and move it to the destination app service to be discovered by parks-map
         sh "oc delete svc mlb-parks-green -n ${prodNamespace}"
         sh "oc create -f ../Infrastructure/templates/parks-prod/mlb-parks-green-svc.yaml -n ${prodNamespace}"
-
         sh "oc label svc mlb-parks-blue type=parksmap-backend --overwrite -n ${prodNamespace}"
         sh "oc patch route mlb-parks --patch=\'{\"spec\":{\"to\":{\"name\":\"${destApp}\"}}}\' -n ${prodNamespace}"
     }
