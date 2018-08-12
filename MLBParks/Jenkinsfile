@@ -17,9 +17,8 @@ podTemplate(
     echo "CLUSTER: ${CLUSTER}"
 
     def projectDir = "MLBParks"
-    def nexusUrl = "http://nexus3-js-nexus.apps.na39.openshift.opentlc.com"
-    def nexusRegistryUrl = "http://nexus-registry-js-nexus.apps.na39.openshift.opentlc.com/"
-    def sonarqubeUrl = "http://sonarqube-js-sonarqube.apps.na39.openshift.opentlc.com"
+    def nexusUrl = "http://nexus3-${GUID}-nexus.apps.na39.openshift.opentlc.com"
+    def sonarqubeUrl = "http://sonarqube-${GUID}-sonarqube.apps.na39.openshift.opentlc.com"
     def apiUrl = "https://master.na39.openshift.opentlc.com"
     def devNamespace = "${GUID}-parks-dev"
     def prodNamespace = "${GUID}-parks-prod"
@@ -84,14 +83,14 @@ podTemplate(
         sleep 15
 
         echo "Get info"
-        sh "curl -i -H 'Content-Leength: 0' -X GET http://mlb-parks-js-parks-dev.apps.na39.openshift.opentlc.com/ws/info/"
+        sh "curl -i -H 'Content-Leength: 0' -X GET http://mlb-parks-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/info/"
         echo "Loading data"
-        sh "curl -i -H Content-Length: 0 -X GET http://mlb-parks-js-parks-dev.apps.na39.openshift.opentlc.com/ws/data/load/"
+        sh "curl -i -H Content-Length: 0 -X GET http://mlb-parks-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/data/load/"
     }
     
     stage('Copy Image to Nexus Docker Registry') {
         echo "Copy image to Nexus Docker Registry"
-        sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/${devNamespace}/mlb-parks:${devTag} docker://nexus-registry.js-nexus.svc.cluster.local:5000/mlb-parks:${devTag}"
+        sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/${devNamespace}/mlb-parks:${devTag} docker://nexus-registry.${GUID}-nexus.svc.cluster.local:5000/mlb-parks:${devTag}"
         openshiftTag alias: 'false', destStream: 'mlb-parks', destTag: prodTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: 'mlb-parks', srcTag: devTag, verbose: 'false'
     }
     
