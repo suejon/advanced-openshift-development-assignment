@@ -17,7 +17,7 @@ podTemplate(
     echo "CLUSTER: ${CLUSTER}"
 
     def projectDir = "ParksMap"
-    def nexusUrl = "http://nexus3-" + "${GUID}" + "-nexus.apps.na39.openshift.opentlc.com"
+    def nexusUrl = "http://nexus3-${GUID}-nexus.apps.na39.openshift.opentlc.com"
     def sonarqubeUrl = "http://sonarqube-${GUID}-sonarqube.apps.na39.openshift.opentlc.com"
     def apiUrl = "https://master.na39.openshift.opentlc.com"
     def devNamespace = "${GUID}-parks-dev"
