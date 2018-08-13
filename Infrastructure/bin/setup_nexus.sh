@@ -41,8 +41,8 @@ while : ; do
   echo "Checking if Nexus is Ready..."
   oc get pod -n ${GUID}-nexus|grep '\-2\-'|grep -v deploy|grep "1/1"
   [[ "$?" == "1" ]] || break
-  echo "...no. Sleeping 10 seconds."
-  sleep 10
+  echo "...no. Sleeping 20 seconds."
+  sleep 20
 done
 
 # Configure nexus to be a docker repository

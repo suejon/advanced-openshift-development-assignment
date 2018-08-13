@@ -139,7 +139,7 @@ podTemplate(
 
         // recreate old service without label:type=parksmap-backend and move it to the destination app service to be discovered by parks-map
         sh "oc delete svc national-parks-green -n ${prodNamespace}"
-        sh "oc create -f ../Infrastructure/templates/parks-prod/national-parks-green-svc.yaml -n ${prodNamespace}"
+        sh "oc create -f Infrastructure/templates/parks-prod/national-parks-green-svc.yaml -n ${prodNamespace}"
 
         sh "oc label svc national-parks-blue type=parksmap-backend --overwrite -n ${prodNamespace}"
         sh "oc patch route national-parks --patch=\'{\"spec\":{\"to\":{\"name\":\"${destApp}\"}}}\' -n ${prodNamespace}"
