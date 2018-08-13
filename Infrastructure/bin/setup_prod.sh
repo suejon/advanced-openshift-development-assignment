@@ -24,6 +24,9 @@ oc create -f ./Infrastructure/templates/parks-prod/mongodb_statefulset.yaml -n $
 oc expose svc/mongodb-internal -n ${GUID}-parks-prod
 oc expose svc/mongodb -n ${GUID}-parks-prod
 
+# wait for dev to build the images?
+sleep 10
+
 # Create Blue/Green Applications
 ## MLB Parks
 ### Blue
