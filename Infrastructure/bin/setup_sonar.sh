@@ -21,7 +21,7 @@ oc rollout pause dc sonarqube -n $GUID-sonarqube
 oc expose service sonarqube -n $GUID-sonarqube
 
 # create pvc
-oc create -f ../templates/sonarqube/sonarqube_pvc.yaml -n $GUID-sonarqube
+oc create -f ./Infrastructure/templates/sonarqube/sonarqube_pvc.yaml -n $GUID-sonarqube
 
 # Bind to PVCs
 oc set volume dc/sonarqube --add --overwrite --name=sonarqube-volume-1 --mount-path=/opt/sonarqube/data/ --type persistentVolumeClaim --claim-name=sonarqube-pvc -n $GUID-sonarqube

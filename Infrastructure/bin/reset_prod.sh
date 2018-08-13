@@ -23,8 +23,8 @@ echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Gr
 echo "Removing labels from blue services so they are no longer used as active backends"
 oc delete svc mlb-parks-blue -n ${GUID}-parks-prod
 oc delete svc national-parks-blue -n ${GUID}-parks-prod
-oc create -f ../templates/parks-prod/mlb-parks-blue-svc.yaml -n ${GUID}-parks-prod
-oc create -f ../templates/parks-prod/national-parks-blue-svc.yaml -n ${GUID}-parks-prod
+oc create -f ./Infrastructure/templates/parks-prod/mlb-parks-blue-svc.yaml -n ${GUID}-parks-prod
+oc create -f ./Infrastructure/templates/parks-prod/national-parks-blue-svc.yaml -n ${GUID}-parks-prod
 
 # Switch parks-map route to point back to green
 echo "Directing traffic back to green deployments"

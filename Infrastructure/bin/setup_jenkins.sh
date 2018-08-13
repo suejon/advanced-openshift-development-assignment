@@ -33,13 +33,12 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 oc new-app jenkins-persistent --name jenkins --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
 
 # create jenkins slave image with skopeo
-cat ../templates/jenkins/Dockerfile | oc new-build --dockerfile=- --name=jenkins-slave-maven-appdev -n ${GUID}-jenkins
-# oc start-build jenkins-slave-maven-appdev -n ${GUID}-jenkins
+cat ./Infrastructure/templates/jenkins/Dockerfile | oc new-build --dockerfile=- --name=jenkins-slave-maven-appdev -n ${GUID}-jenkins
 
 # set up 3 BCs that point to the pipelines located in source code
-oc create -f ../templates/jenkins/mlbparks_bc.yaml -n ${GUID}-jenkins
-oc create -f ../templates/jenkins/nationalparks_bc.yaml -n ${GUID}-jenkins
-oc create -f ../templates/jenkins/parksmap_bc.yaml -n ${GUID}-jenkins
+oc create -f ./Infrastructure/templates/jenkins/mlbparks_bc.yaml -n ${GUID}-jenkins
+oc create -f ./Infrastructure/templates/jenkins/nationalparks_bc.yaml -n ${GUID}-jenkins
+oc create -f ./Infrastructure/templates/jenkins/parksmap_bc.yaml -n ${GUID}-jenkins
 
 # set environmental variables in build configs for pipeline: GUID, Cluster
 oc set env bc/mlbparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins

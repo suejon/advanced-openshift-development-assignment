@@ -18,8 +18,8 @@ echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
 oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-parks-dev
 oc policy add-role-to-user view --serviceaccount=default -n ${GUID}-parks-dev
 
-oc new-app -f ../templates/parks-dev/mongodb_services.yaml -n ${GUID}-parks-dev
-oc create -f ../templates/parks-dev/mongodb_statefulset.yaml -n ${GUID}-parks-dev
+oc new-app -f ./Infrastructure/templates/parks-dev/mongodb_services.yaml -n ${GUID}-parks-dev
+oc create -f ./Infrastructure/templates/parks-dev/mongodb_statefulset.yaml -n ${GUID}-parks-dev
 
 oc expose svc/mongodb-internal -n ${GUID}-parks-dev
 oc expose svc/mongodb -n ${GUID}-parks-dev

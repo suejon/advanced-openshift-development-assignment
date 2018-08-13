@@ -18,12 +18,11 @@ oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n
 oc policy add-role-to-user view --serviceaccount=default -n ${GUID}-parks-prod
 
 # spin up mongo db via stateful set
-oc new-app -f ../templates/parks-prod/mongodb_services.yaml -n ${GUID}-parks-prod
-oc create -f ../templates/parks-prod/mongodb_statefulset.yaml -n ${GUID}-parks-prod
+oc new-app -f ./Infrastructure/templates/parks-prod/mongodb_services.yaml -n ${GUID}-parks-prod
+oc create -f ./Infrastructure/templates/parks-prod/mongodb_statefulset.yaml -n ${GUID}-parks-prod
 
 oc expose svc/mongodb-internal -n ${GUID}-parks-prod
 oc expose svc/mongodb -n ${GUID}-parks-prod
-
 
 # Create Blue/Green Applications
 ## MLB Parks

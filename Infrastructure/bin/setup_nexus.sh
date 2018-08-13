@@ -29,7 +29,7 @@ echo "Setting up Nexus in project $GUID-nexus"
 # oc new-app -f ../templates/nexus.yaml --param .....
 
 # To be Implemented by Student
-oc new-app -f ../templates/nexus/nexus_template.yaml -n ${GUID}-nexus
+oc new-app -f ./Infrastructure/templates/nexus/nexus_template.yaml -n ${GUID}-nexus
 
 # remount nexus to the PVC
 oc set volume dc/nexus3 --add --overwrite --name=nexus3-volume-1 --mount-path=/nexus-data/ --type persistentVolumeClaim --claim-name=nexus-pvc -n ${GUID}-nexus
