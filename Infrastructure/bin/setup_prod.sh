@@ -74,6 +74,13 @@ oc create configmap parks-map-green-config --from-literal="application-users.pro
 oc set volume dc/parks-map-green --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=parks-map-green-config -n ${GUID}-parks-prod
 oc set volume dc/parks-map-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=parks-map-green-config -n ${GUID}-parks-prod
 
+# Set environmental variables for connecting to the db
+oc set env dc/mlb-parks-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+oc set env dc/mlb-parks-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+oc set env dc/national-parks-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+oc set env dc/national-parks-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+
+
 # Expose Green service as route to make blue application active
 oc expose svc/parks-map-green --name parks-map -n ${GUID}-parks-prod
 oc expose svc/mlb-parks-green --name mlb-parks -n ${GUID}-parks-prod
