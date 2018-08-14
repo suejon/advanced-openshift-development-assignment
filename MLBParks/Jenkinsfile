@@ -61,8 +61,10 @@ podTemplate(
     
     stage("Build and Tag Openshift Image") {
         echo "Building OpenShift container image mlb-parks:${devTag}"
-        sh "oc start-build mlb-parks --from-file=${nexusUrl}/repository/releases/com/openshift/evg/roadshow/mlbparks/${version}/mlbparks-${version}.war -n ${devNamespace}"
-        openshiftVerifyBuild apiURL: apiUrl, bldCfg: 'mlb-parks', checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'
+        sh "if [ ! -f ./mlbparks-${version}.jar ]; then wget ${nexusUrl}/repository/releases/com/openshift/evg/roadshow/mlbparks/${version}/mlbparks-${version}.jar; fi"
+        sh "oc start-build mlb-parks --from-file=./mlbparks-${version}.jar -n ${devNamespace}"
+        openshiftVerifyBuild apiURL: apiUrl, bldCfg: 'mlb-parks', checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'               
+        sh "rm ./mlbparks-*.jar"
         // // to tag the image
         openshiftTag alias: 'false', apiURL: apiUrl, destStream: 'mlb-parks', destTag: devTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: 'mlb-parks', srcTag: 'latest', verbose: 'false'
     }
