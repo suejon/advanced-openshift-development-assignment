@@ -60,13 +60,13 @@ oc set triggers dc/national-parks --remove-all -n ${GUID}-parks-dev
 
 # set up health probes
 oc set probe dc/parks-map -n ${GUID}-parks-dev --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
-oc set probe dc/parks-map --readiness --failure-threshold 3 --initial-delay-seconds 20 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+oc set probe dc/parks-map --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
 
 oc set probe dc/mlb-parks -n ${GUID}-parks-dev --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
-oc set probe dc/mlb-parks --readiness --failure-threshold 3 --initial-delay-seconds 20 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+oc set probe dc/mlb-parks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
 
 oc set probe dc/national-parks -n ${GUID}-parks-dev --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
-oc set probe dc/national-parks --readiness --failure-threshold 3 --initial-delay-seconds 20 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+oc set probe dc/national-parks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
 
 # expose and label the services so the front end (parks-map) can find them
 oc expose dc parks-map --port 8080 -n ${GUID}-parks-dev

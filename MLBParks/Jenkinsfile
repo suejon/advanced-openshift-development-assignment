@@ -72,6 +72,7 @@ podTemplate(
         sh "oc set image dc/mlb-parks mlb-parks=docker-registry.default.svc:5000/${devNamespace}/mlb-parks:${devTag} -n ${devNamespace}"
         sh "oc delete configmap mlb-parks-config --ignore-not-found=true -n ${devNamespace}"
         sh "oc create configmap mlb-parks-config --from-file=configuration/application-users.properties --from-file=configuration/application-roles.properties -n ${devNamespace}"
+        sh "oc label svc mlb-parks type=parksmap-backend --overwrite -n ${devNamespace}"
         
         openshiftDeploy apiURL: apiUrl, depCfg: "mlb-parks", namespace: devNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
         openshiftVerifyDeployment apiURL: apiUrl, depCfg: "mlb-parks", namespace: devNamespace, replicaCount: '', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'

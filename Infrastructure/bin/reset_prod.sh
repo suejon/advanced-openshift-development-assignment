@@ -26,6 +26,16 @@ oc delete svc national-parks-blue -n ${GUID}-parks-prod
 oc create -f ./Infrastructure/templates/parks-prod/mlb-parks-blue-svc.yaml -n ${GUID}-parks-prod
 oc create -f ./Infrastructure/templates/parks-prod/national-parks-blue-svc.yaml -n ${GUID}-parks-prod
 
+# set up health probes
+oc set probe dc/parks-map -n ${GUID}-parks-prod --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
+oc set probe dc/parks-map --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
+
+oc set probe dc/mlb-parks -n ${GUID}-parks-prod --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
+oc set probe dc/mlb-parks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
+
+oc set probe dc/national-parks -n ${GUID}-parks-prod --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
+oc set probe dc/national-parks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
+
 # Switch parks-map route to point back to green
 echo "Directing traffic back to green deployments"
 oc patch route mlb-parks --patch='{"spec":{"to":{"name": "mlb-parks-green"}}}' -n ${GUID}-parks-prod

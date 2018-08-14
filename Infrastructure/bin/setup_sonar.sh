@@ -30,6 +30,6 @@ oc set resources dc/sonarqube --limits=memory=3Gi,cpu=2 --requests=memory=2Gi,cp
 oc patch dc sonarqube --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n $GUID-sonarqube
 
 oc set probe dc/sonarqube -n $GUID-sonarqube --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
-oc set probe dc/sonarqube -n $GUID-sonarqube --readiness --failure-threshold 3 --initial-delay-seconds 20 --get-url=http://:9000/about
+oc set probe dc/sonarqube -n $GUID-sonarqube --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:9000/about
 
 oc rollout resume dc sonarqube -n $GUID-sonarqube
