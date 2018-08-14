@@ -24,7 +24,7 @@ oc create -f ./Infrastructure/templates/parks-prod/mongodb_statefulset.yaml -n $
 oc expose svc/mongodb-internal -n ${GUID}-parks-prod
 oc expose svc/mongodb -n ${GUID}-parks-prod
 
-# wait for dev to build the images?
+echo "Wait for dev project to create the imagestreams used in production"
 sleep 10
 
 # Create Blue/Green Applications
