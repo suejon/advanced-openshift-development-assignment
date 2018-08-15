@@ -118,7 +118,7 @@ podTemplate(
 
         // Update the Config Map which contains the users for the Tasks application
         sh "oc delete configmap ${destApp}-config -n ${prodNamespace} --ignore-not-found=true"
-        sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties -n ${prodNamespace}"
+        sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties --from-file=./configuration/${nationalparks}.properties -n ${prodNamespace}"
 
         // label the green app as the backend (need to delete the service and recreate + label the blue to refresh the cache)
         sh "oc label svc ${nationalparks}-green type=parksmap-backend --overwrite -n ${prodNamespace}"

@@ -33,9 +33,9 @@ oc new-build --binary=true --name=${MlbParks} jboss-eap70-openshift:1.6 -n ${GUI
 oc new-build --binary=true --name=${NationalParks} redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
 
 # set up config maps for each micro-service
-oc create configmap ${ParksMap}-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Dev)" -n ${GUID}-parks-dev
-oc create configmap ${MlbParks}-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Dev)" -n ${GUID}-parks-dev
-oc create configmap ${NationalParks}-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Dev)" -n ${GUID}-parks-dev
+oc create configmap ${ParksMap}-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Dev)" -n ${GUID}-parks-dev
+oc create configmap ${MlbParks}-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Dev)" -n ${GUID}-parks-dev
+oc create configmap ${NationalParks}-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Dev)" -n ${GUID}-parks-dev
 
 # set up placeholder deployments
 oc new-app ${GUID}-parks-dev/${ParksMap}:0.0-0 --name=${ParksMap} --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
