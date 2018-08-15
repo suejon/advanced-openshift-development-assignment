@@ -31,9 +31,9 @@ oc create -f ./Infrastructure/templates/parks-prod/${NationalParks}-blue-svc.yam
 
 # Switch parks-map route to point back to green (should have been recreated in pipeline)
 echo "Directing traffic back to green deployments"
-oc patch route ${MlbParks} --patch='{"spec":{"to":{"name": "' + ${MlbParks} + '-green"}}}' -n ${GUID}-parks-prod
-oc patch route ${NationalParks} --patch='{"spec":{"to":{"name": "' + ${NationalParks} + '-green"}}}' -n ${GUID}-parks-prod
-oc patch route ${ParksMap} --patch='{"spec":{"to":{"name": "' + ${ParksMap} + '-green"}}}' -n ${GUID}-parks-prod
+oc patch route ${MlbParks} --patch='{"spec":{"to":{"name": "mlbparks-green"}}}' -n ${GUID}-parks-prod
+oc patch route ${NationalParks} --patch='{"spec":{"to":{"name": "nationalparks-green"}}}' -n ${GUID}-parks-prod
+oc patch route ${ParksMap} --patch='{"spec":{"to":{"name": "parksmap-green"}}}' -n ${GUID}-parks-prod
 
 # label green services with correct labels: app and type
 echo "Label the green services as the active backends"
