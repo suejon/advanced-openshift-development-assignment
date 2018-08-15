@@ -29,7 +29,7 @@ oc delete svc ${NationalParks}-blue -n ${GUID}-parks-prod
 oc create -f ./Infrastructure/templates/parks-prod/${MlbParks}-blue-svc.yaml -n ${GUID}-parks-prod
 oc create -f ./Infrastructure/templates/parks-prod/${NationalParks}-blue-svc.yaml -n ${GUID}-parks-prod
 
-# Switch parks-map route to point back to green
+# Switch parks-map route to point back to green (should have been recreated in pipeline)
 echo "Directing traffic back to green deployments"
 oc patch route ${MlbParks} --patch='{"spec":{"to":{"name": "' + ${MlbParks} + '-green"}}}' -n ${GUID}-parks-prod
 oc patch route ${NationalParks} --patch='{"spec":{"to":{"name": "' + ${NationalParks} + '-green"}}}' -n ${GUID}-parks-prod

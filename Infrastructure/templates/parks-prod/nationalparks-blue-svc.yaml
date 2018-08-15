@@ -3,16 +3,16 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: national-parks-green
-  name: national-parks-green
+    app: nationalparks-blue
+  name: nationalparks-blue
 spec:
   ports:
   - port: 8080
     protocol: TCP
     targetPort: 8080
   selector:
-    app: national-parks-green
-    deploymentconfig: national-parks-green
+    app: nationalparks-blue
+    deploymentconfig: nationalparks-blue
   sessionAffinity: None
   type: ClusterIP
 status:

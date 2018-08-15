@@ -3,16 +3,16 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    app: mlb-parks-blue
-  name: mlb-parks-blue
+    app: mlbparks-green
+  name: mlbparks-green
 spec:
   ports:
   - port: 8080
     protocol: TCP
     targetPort: 8080
   selector:
-    app: mlb-parks-blue
-    deploymentconfig: mlb-parks-blue
+    app: mlbparks-green
+    deploymentconfig: mlbparks-green
   sessionAffinity: None
   type: ClusterIP
 status:
