@@ -87,11 +87,11 @@ podTemplate(
         sleep 15
 
         echo "Get info"
-        sh "curl -i -H 'Content-Leength: 0' -X GET http://${nationalparks}-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/info/"
-        sh "curl -i -H 'Content-Leength: 0' -X GET http://${nationalparks}-${GUID}-parks-dev.svc.cluster.local:8080/ws/info/"
+        sh "curl -i -H 'Content-Leength: 0' -X GET http://${nationalparks}.${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/info/"
+        sh "curl -i -H 'Content-Leength: 0' -X GET http://${nationalparks}.${GUID}-parks-dev.svc.cluster.local:8080/ws/info/"
         echo "Loading data"
-        sh "curl -i -H Content-Length: 0 -X GET http://${nationalparks}-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/data/load/"
-        sh "curl -i -H Content-Length: 0 -X GET http://${nationalparks}-${GUID}-parks-dev.svc.cluster.local:8080/ws/data/load/"
+        sh "curl -i -H Content-Length: 0 -X GET http://${nationalparks}.${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/data/load/"
+        sh "curl -i -H Content-Length: 0 -X GET http://${nationalparks}.${GUID}-parks-dev.svc.cluster.local:8080/ws/data/load/"
     }
     
     stage('Copy Image to Nexus Docker Registry') {
