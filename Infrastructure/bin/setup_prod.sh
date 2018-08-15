@@ -7,6 +7,9 @@ if [ "$#" -ne 1 ]; then
 fi
 
 GUID=$1
+ParksMap="parksmap"
+MlbParks="mlbparks"
+NationalParks="nationalparks"
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 
 # Code to set up the parks production project. It will need a StatefulSet MongoDB, and two applications each (Blue/Green) for NationalParks, MLBParks and Parksmap.
@@ -31,60 +34,60 @@ sleep 10
 # Create Blue/Green Applications
 ## MLB Parks
 ### Blue
-oc new-app ${GUID}-parks-dev/mlb-parks:0.0 --name=mlb-parks-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
-oc set triggers dc/mlb-parks-blue --remove-all -n ${GUID}-parks-prod
-oc expose dc mlb-parks-blue --port 8080 -n ${GUID}-parks-prod
-oc create configmap mlb-parks-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Blue)" -n ${GUID}-parks-prod
-oc set volume dc/mlb-parks-blue --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=mlb-parks-blue-config -n ${GUID}-parks-prod
-oc set volume dc/mlb-parks-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=mlb-parks-blue-config -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/${MlbParks}:0.0 --name=${MlbParks}-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc set triggers dc/${MlbParks}-blue --remove-all -n ${GUID}-parks-prod
+oc expose dc ${MlbParks}-blue --port 8080 -n ${GUID}-parks-prod
+oc create configmap ${MlbParks}-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Blue)" -n ${GUID}-parks-prod
+oc set volume dc/${MlbParks}-blue --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=${MlbParks}-blue-config -n ${GUID}-parks-prod
+oc set volume dc/${MlbParks}-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${MlbParks}-blue-config -n ${GUID}-parks-prod
 ### Green
-oc new-app ${GUID}-parks-dev/mlb-parks:0.0 --name=mlb-parks-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
-oc set triggers dc/mlb-parks-green --remove-all -n ${GUID}-parks-prod
-oc expose dc mlb-parks-green --port 8080 -n ${GUID}-parks-prod
-oc create configmap mlb-parks-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Green)" -n ${GUID}-parks-prod
-oc set volume dc/mlb-parks-green --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=mlb-parks-green-config -n ${GUID}-parks-prod
-oc set volume dc/mlb-parks-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=mlb-parks-green-config -n ${GUID}-parks-prod   
+oc new-app ${GUID}-parks-dev/${MlbParks}:0.0 --name=${MlbParks}-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc set triggers dc/${MlbParks}-green --remove-all -n ${GUID}-parks-prod
+oc expose dc ${MlbParks}-green --port 8080 -n ${GUID}-parks-prod
+oc create configmap ${MlbParks}-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Green)" -n ${GUID}-parks-prod
+oc set volume dc/${MlbParks}-green --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=${MlbParks}-green-config -n ${GUID}-parks-prod
+oc set volume dc/${MlbParks}-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${MlbParks}-green-config -n ${GUID}-parks-prod   
 
 ## National Parks
 ### Blue
-oc new-app ${GUID}-parks-dev/national-parks:0.0 --name=national-parks-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
-oc set triggers dc/national-parks-blue --remove-all -n ${GUID}-parks-prod
-oc expose dc national-parks-blue --port 8080 -n ${GUID}-parks-prod
-oc create configmap national-parks-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Blue)" -n ${GUID}-parks-prod
-oc set volume dc/national-parks-blue --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=national-parks-blue-config -n ${GUID}-parks-prod
-oc set volume dc/national-parks-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=national-parks-blue-config -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/${NationalParks}:0.0 --name=${NationalParks}-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc set triggers dc/${NationalParks}-blue --remove-all -n ${GUID}-parks-prod
+oc expose dc ${NationalParks}-blue --port 8080 -n ${GUID}-parks-prod
+oc create configmap ${NationalParks}-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Blue)" -n ${GUID}-parks-prod
+oc set volume dc/${NationalParks}-blue --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=${NationalParks}-blue-config -n ${GUID}-parks-prod
+oc set volume dc/${NationalParks}-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${NationalParks}-blue-config -n ${GUID}-parks-prod
 ### Green
-oc new-app ${GUID}-parks-dev/national-parks:0.0 --name=national-parks-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
-oc set triggers dc/national-parks-green --remove-all -n ${GUID}-parks-prod
-oc expose dc national-parks-green --port 8080 -n ${GUID}-parks-prod
-oc create configmap national-parks-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Green)" -n ${GUID}-parks-prod
-oc set volume dc/national-parks-green --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=national-parks-green-config -n ${GUID}-parks-prod
-oc set volume dc/national-parks-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=national-parks-green-config -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/${NationalParks}:0.0 --name=${NationalParks}-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc set triggers dc/${NationalParks}-green --remove-all -n ${GUID}-parks-prod
+oc expose dc ${NationalParks}-green --port 8080 -n ${GUID}-parks-prod
+oc create configmap ${NationalParks}-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Green)" -n ${GUID}-parks-prod
+oc set volume dc/${NationalParks}-green --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=${NationalParks}-green-config -n ${GUID}-parks-prod
+oc set volume dc/${NationalParks}-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${NationalParks}-green-config -n ${GUID}-parks-prod
 
 ## ParksMap
 ### Blue
-oc new-app ${GUID}-parks-dev/parks-map:0.0 --name=parks-map-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
-oc set triggers dc/parks-map-blue --remove-all -n ${GUID}-parks-prod
-oc expose dc parks-map-blue --port 8080 -n ${GUID}-parks-prod
-oc create configmap parks-map-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Blue)" -n ${GUID}-parks-prod
-oc set volume dc/parks-map-blue --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=parks-map-blue-config -n ${GUID}-parks-prod
-oc set volume dc/parks-map-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=parks-map-blue-config -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/${ParksMap}:0.0 --name=${ParksMap}-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc set triggers dc/${ParksMap}-blue --remove-all -n ${GUID}-parks-prod
+oc expose dc ${ParksMap}-blue --port 8080 -n ${GUID}-parks-prod
+oc create configmap ${ParksMap}-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Blue)" -n ${GUID}-parks-prod
+oc set volume dc/${ParksMap}-blue --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=${ParksMap}-blue-config -n ${GUID}-parks-prod
+oc set volume dc/${ParksMap}-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${ParksMap}-blue-config -n ${GUID}-parks-prod
 ### Green
-oc new-app ${GUID}-parks-dev/parks-map:0.0 --name=parks-map-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
-oc set triggers dc/parks-map-green --remove-all -n ${GUID}-parks-prod
-oc expose dc parks-map-green --port 8080 -n ${GUID}-parks-prod
-oc create configmap parks-map-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Green)" -n ${GUID}-parks-prod
-oc set volume dc/parks-map-green --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=parks-map-green-config -n ${GUID}-parks-prod
-oc set volume dc/parks-map-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=parks-map-green-config -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/${ParksMap}:0.0 --name=${ParksMap}-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc set triggers dc/${ParksMap}-green --remove-all -n ${GUID}-parks-prod
+oc expose dc ${ParksMap}-green --port 8080 -n ${GUID}-parks-prod
+oc create configmap ${ParksMap}-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Green)" -n ${GUID}-parks-prod
+oc set volume dc/${ParksMap}-green --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=${ParksMap}-green-config -n ${GUID}-parks-prod
+oc set volume dc/${ParksMap}-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${ParksMap}-green-config -n ${GUID}-parks-prod
 
 # Set environmental variables for connecting to the db
-oc set env dc/mlb-parks-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
-oc set env dc/mlb-parks-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
-oc set env dc/national-parks-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
-oc set env dc/national-parks-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+oc set env dc/${MlbParks}-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+oc set env dc/${MlbParks}-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+oc set env dc/${NationalParks}-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
+oc set env dc/${NationalParks}-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
 
 
 # Expose Green service as route to make blue application active
-oc expose svc/parks-map-green --name parks-map -n ${GUID}-parks-prod
-oc expose svc/mlb-parks-green --name mlb-parks -n ${GUID}-parks-prod
-oc expose svc/national-parks-green --name national-parks -n ${GUID}-parks-prod
+oc expose svc/${ParksMap}-green --name ${ParksMap} -n ${GUID}-parks-prod
+oc expose svc/${MlbParks}-green --name ${MlbParks} -n ${GUID}-parks-prod
+oc expose svc/${NationalParks}-green --name ${NationalParks} -n ${GUID}-parks-prod

@@ -23,6 +23,7 @@ podTemplate(
     def devNamespace = "${GUID}-parks-dev"
     def prodNamespace = "${GUID}-parks-prod"
     def mvnCmd = "mvn -s ./nexus_settings.xml -f ${projectDir}/pom.xml"
+    def mlbparks="mlbparks"
 
     // Your Pipeline Code goes here. Make sure to use the ${GUID} and ${CLUSTER} parameters where appropriate
     // You need to build the application in directory `MLBParks`.
@@ -60,25 +61,25 @@ podTemplate(
     }
     
     stage("Build and Tag Openshift Image") {
-        echo "Building OpenShift container image mlb-parks:${devTag}"
-        sh "if [ ! -f ./mlbparks-${version}.jar ]; then wget ${nexusUrl}/repository/releases/com/openshift/evg/roadshow/mlbparks/${version}/mlbparks-${version}.war; fi"
-        sh "oc start-build mlb-parks --from-file=./mlbparks-${version}.war -n ${devNamespace}"
-        openshiftVerifyBuild apiURL: apiUrl, bldCfg: 'mlb-parks', checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'               
-        sh "rm ./mlbparks-*.war"
+        echo "Building OpenShift container image ${mlbparks}:${devTag}"
+        sh "if [ ! -f ./${mlbparks}-${version}.jar ]; then wget ${nexusUrl}/repository/releases/com/openshift/evg/roadshow/${mlbparks}/${version}/${mlbparks}-${version}.war; fi"
+        sh "oc start-build ${mlbparks} --from-file=./${mlbparks}-${version}.war -n ${devNamespace}"
+        openshiftVerifyBuild apiURL: apiUrl, bldCfg: ${mlbparks}, checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'               
+        sh "rm ./${mlbparks}-*.war"
         // // to tag the image
-        openshiftTag alias: 'false', apiURL: apiUrl, destStream: 'mlb-parks', destTag: devTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: 'mlb-parks', srcTag: 'latest', verbose: 'false'
+        openshiftTag alias: 'false', apiURL: apiUrl, destStream: ${mlbparks}, destTag: devTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: ${mlbparks}, srcTag: 'latest', verbose: 'false'
     }
     
     stage('Deploy to Dev') {
         echo "Deploying container image to Development Project"
-        sh "oc set image dc/mlb-parks mlb-parks=docker-registry.default.svc:5000/${devNamespace}/mlb-parks:${devTag} -n ${devNamespace}"
-        sh "oc delete configmap mlb-parks-config --ignore-not-found=true -n ${devNamespace}"
-        sh "oc create configmap mlb-parks-config --from-file=configuration/application-users.properties --from-file=configuration/application-roles.properties -n ${devNamespace}"
-        sh "oc label svc mlb-parks type=parksmap-backend --overwrite -n ${devNamespace}"
+        sh "oc set image dc/${mlbparks} ${mlbparks}=docker-registry.default.svc:5000/${devNamespace}/${mlbparks}:${devTag} -n ${devNamespace}"
+        sh "oc delete configmap ${mlbparks}-config --ignore-not-found=true -n ${devNamespace}"
+        sh "oc create configmap ${mlbparks}-config --from-file=configuration/application-users.properties --from-file=configuration/application-roles.properties -n ${devNamespace}"
+        sh "oc label svc ${mlbparks} type=parksmap-backend --overwrite -n ${devNamespace}"
         
-        openshiftDeploy apiURL: apiUrl, depCfg: "mlb-parks", namespace: devNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
-        openshiftVerifyDeployment apiURL: apiUrl, depCfg: "mlb-parks", namespace: devNamespace, replicaCount: '', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
-        openshiftVerifyService apiURL: apiUrl, namespace: devNamespace, svcName: "mlb-parks", verbose: 'false'
+        openshiftDeploy apiURL: apiUrl, depCfg: "${mlbparks}", namespace: devNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
+        openshiftVerifyDeployment apiURL: apiUrl, depCfg: "${mlbparks}", namespace: devNamespace, replicaCount: '', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
+        openshiftVerifyService apiURL: apiUrl, namespace: devNamespace, svcName: "${mlbparks}", verbose: 'false'
     }
     
     stage('Integration Tests') {
@@ -86,38 +87,41 @@ podTemplate(
         sleep 15
 
         echo "Get info"
-        sh "curl -i -H 'Content-Leength: 0' -X GET http://mlb-parks-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/info/"
+        sh "curl -i -H 'Content-Leength: 0' -X GET http://${mlbparks}-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/info/"
+        sh "curl -i -H 'Content-Leength: 0' -X GET http://${mlbparks}-${GUID}-parks-dev.svc.cluster.local:8080/ws/info/"
         echo "Loading data"
-        sh "curl -i -H Content-Length: 0 -X GET http://mlb-parks-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/data/load/"
+        sh "curl -i -H Content-Length: 0 -X GET http://${mlbparks}-${GUID}-parks-dev.apps.na39.openshift.opentlc.com/ws/data/load/"
+        sh "curl -i -H Content-Length: 0 -X GET http://${mlbparks}-${GUID}-parks-dev.svc.cluster.local:8080/ws/data/load/"
+        
     }
     
     stage('Copy Image to Nexus Docker Registry') {
         echo "Copy image to Nexus Docker Registry"
-        sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/${devNamespace}/mlb-parks:${devTag} docker://nexus-registry.${GUID}-nexus.svc.cluster.local:5000/mlb-parks:${devTag}"
-        openshiftTag alias: 'false', destStream: 'mlb-parks', destTag: prodTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: 'mlb-parks', srcTag: devTag, verbose: 'false'
+        sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/${devNamespace}/${mlbparks}:${devTag} docker://nexus-registry.${GUID}-nexus.svc.cluster.local:5000/${mlbparks}:${devTag}"
+        openshiftTag alias: 'false', destStream: ${mlbparks}, destTag: prodTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: ${mlbparks}, srcTag: devTag, verbose: 'false'
     }
     
-    def destApp = "mlb-parks-green"
+    def destApp = "${mlbparks}-green"
     def activeApp = ""
     
     stage('Blue/Green Production Deployment') {
-        activeApp = sh(returnStdout: true, script: "oc get route mlb-parks -n ${prodNamespace} -o jsonpath='{ .spec.to.name }'").trim()
-        if (activeApp == "mlb-parks-green") {
-            destApp = "mlb-parks-blue"
+        activeApp = sh(returnStdout: true, script: "oc get route ${mlbparks} -n ${prodNamespace} -o jsonpath='{ .spec.to.name }'").trim()
+        if (activeApp == "${mlbparks}-green") {
+            destApp = "${mlbparks}-blue"
         }
         echo "Active Application:      " + activeApp
         echo "Destination Application: " + destApp
 
         // Update the Image on the Production Deployment Config
-        sh "oc set image dc/${activeApp} ${activeApp}=docker-registry.default.svc:5000/${devNamespace}/mlb-parks:${prodTag} -n ${prodNamespace}"
-        sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/${devNamespace}/mlb-parks:${prodTag} -n ${prodNamespace}"
+        sh "oc set image dc/${activeApp} ${activeApp}=docker-registry.default.svc:5000/${devNamespace}/${mlbparks}:${prodTag} -n ${prodNamespace}"
+        sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/${devNamespace}/${mlbparks}:${prodTag} -n ${prodNamespace}"
 
         // Update the Config Map which contains the users for the Tasks application
         sh "oc delete configmap ${destApp}-config -n ${prodNamespace} --ignore-not-found=true"
         sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties -n ${prodNamespace}"
 
         // label the green app as the backend (need to delete the service and recreate + label the blue to refresh the cache)
-        sh "oc label svc mlb-parks-green type=parksmap-backend --overwrite -n ${prodNamespace}"
+        sh "oc label svc ${mlbparks}-green type=parksmap-backend --overwrite -n ${prodNamespace}"
 
         // Deploy the active application.
         echo "Deploying " + activeApp
@@ -139,10 +143,10 @@ podTemplate(
         echo "Switching Production application to ${destApp}."
 
         // recreate old service without label:type=parksmap-backend and move it to the destination app service to be discovered by parks-map
-        sh "oc delete svc mlb-parks-green -n ${prodNamespace}"
-        sh "oc create -f Infrastructure/templates/parks-prod/mlb-parks-green-svc.yaml -n ${prodNamespace}"
-        sh "oc label svc mlb-parks-blue type=parksmap-backend --overwrite -n ${prodNamespace}"
-        sh "oc patch route mlb-parks --patch=\'{\"spec\":{\"to\":{\"name\":\"${destApp}\"}}}\' -n ${prodNamespace}"
+        sh "oc delete svc ${mlbparks}-green -n ${prodNamespace}"
+        sh "oc create -f Infrastructure/templates/parks-prod/${mlbparks}-green-svc.yaml -n ${prodNamespace}"
+        sh "oc label svc ${mlbparks}-blue type=parksmap-backend --overwrite -n ${prodNamespace}"
+        sh "oc patch route ${mlbparks} --patch=\'{\"spec\":{\"to\":{\"name\":\"${destApp}\"}}}\' -n ${prodNamespace}"
     }
   }
 }

@@ -8,6 +8,9 @@ if [ "$#" -ne 1 ]; then
 fi
 
 GUID=$1
+ParksMap="parksmap"
+MlbParks="mlbparks"
+NationalParks="nationalparks"
 echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Green Services"
 
 # Code to reset the parks production environment to make
@@ -21,28 +24,18 @@ echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Gr
 
 # delete + create blue services (w/o labels)
 echo "Removing labels from blue services so they are no longer used as active backends"
-oc delete svc mlb-parks-blue -n ${GUID}-parks-prod
-oc delete svc national-parks-blue -n ${GUID}-parks-prod
-oc create -f ./Infrastructure/templates/parks-prod/mlb-parks-blue-svc.yaml -n ${GUID}-parks-prod
-oc create -f ./Infrastructure/templates/parks-prod/national-parks-blue-svc.yaml -n ${GUID}-parks-prod
-
-# set up health probes
-oc set probe dc/parks-map -n ${GUID}-parks-prod --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
-oc set probe dc/parks-map --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
-
-oc set probe dc/mlb-parks -n ${GUID}-parks-prod --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
-oc set probe dc/mlb-parks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
-
-oc set probe dc/national-parks -n ${GUID}-parks-prod --liveness --failure-threshold 3 --initial-delay-seconds 40 -- echo ok
-oc set probe dc/national-parks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
+oc delete svc ${MlbParks}-blue -n ${GUID}-parks-prod
+oc delete svc ${NationalParks}-blue -n ${GUID}-parks-prod
+oc create -f ./Infrastructure/templates/parks-prod/${MlbParks}-blue-svc.yaml -n ${GUID}-parks-prod
+oc create -f ./Infrastructure/templates/parks-prod/${NationalParks}-blue-svc.yaml -n ${GUID}-parks-prod
 
 # Switch parks-map route to point back to green
 echo "Directing traffic back to green deployments"
-oc patch route mlb-parks --patch='{"spec":{"to":{"name": "mlb-parks-green"}}}' -n ${GUID}-parks-prod
-oc patch route national-parks --patch='{"spec":{"to":{"name": "national-parks-green"}}}' -n ${GUID}-parks-prod
-oc patch route parks-map --patch='{"spec":{"to":{"name": "parks-map-green"}}}' -n ${GUID}-parks-prod
+oc patch route ${MlbParks} --patch='{"spec":{"to":{"name": "' + ${MlbParks} + '-green"}}}' -n ${GUID}-parks-prod
+oc patch route ${NationalParks} --patch='{"spec":{"to":{"name": "' + ${NationalParks} + '-green"}}}' -n ${GUID}-parks-prod
+oc patch route ${ParksMap} --patch='{"spec":{"to":{"name": "' + ${ParksMap} + '-green"}}}' -n ${GUID}-parks-prod
 
 # label green services with correct labels: app and type
 echo "Label the green services as the active backends"
-oc label svc mlb-parks-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod
-oc label svc national-parks-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod
+oc label svc ${MlbParks}-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod
+oc label svc ${NationalParks}-green type=parksmap-backend --overwrite -n ${GUID}-parks-prod
