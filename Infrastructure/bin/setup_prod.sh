@@ -81,11 +81,12 @@ oc set volume dc/${ParksMap}-green --add --name=jboss-config --mount-path=/opt/e
 oc set volume dc/${ParksMap}-green --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${ParksMap}-green-config -n ${GUID}-parks-prod
 
 # Set environmental variables for connecting to the db
-oc set env dc/${MlbParks}-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
-oc set env dc/${MlbParks}-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
-oc set env dc/${NationalParks}-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
-oc set env dc/${NationalParks}-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-prod
-
+oc set env dc/${MlbParks}-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/${MlbParks}-green-config -n ${GUID}-parks-prod
+oc set env dc/${MlbParks}-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/${MlbParks}-blue-config -n ${GUID}-parks-prod
+oc set env dc/${NationalParks}-green DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/${NationalParks}-green-config -n ${GUID}-parks-prod
+oc set env dc/${NationalParks}-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/${NationalParks}-blue-config -n ${GUID}-parks-prod
+oc set env dc/${ParksMap}-green --from=configmap/${ParksMap}-green-config -n ${GUID}-parks-prod
+oc set env dc/${ParksMap}-blue --from=configmap/${ParksMap}-blue-config -n ${GUID}-parks-prod
 
 # Expose Green service as route to make blue application active
 oc expose svc/${ParksMap}-green --name ${ParksMap} -n ${GUID}-parks-prod

@@ -43,8 +43,9 @@ oc new-app ${GUID}-parks-dev/${MlbParks}:0.0-0 --name=${MlbParks} --allow-missin
 oc new-app ${GUID}-parks-dev/${NationalParks}:0.0-0 --name=${NationalParks} --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 # set environmental variables for connecting to mongo db
-oc set env dc/${MlbParks} DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-dev
-oc set env dc/${NationalParks} DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 -n ${GUID}-parks-dev
+oc set env dc/${MlbParks} DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/${MlbParks}-config -n ${GUID}-parks-dev
+oc set env dc/${NationalParks} DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/${NationalParks}-config -n ${GUID}-parks-dev
+oc set env dc/${ParksMap} --from=configmap/${ParksMap}-config -n ${GUID}-parks-dev
 
 # configure mount path and apply configurationmaps to each service
 oc set volume dc/${ParksMap} --add --name=jboss-config --mount-path=/opt/eap/standalone/configuration/application-users.properties --sub-path=application-users.properties --configmap-name=${ParksMap}-config -n ${GUID}-parks-dev

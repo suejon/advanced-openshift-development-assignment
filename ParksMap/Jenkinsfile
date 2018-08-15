@@ -74,7 +74,7 @@ podTemplate(
         echo "Deploying container image to Development Project"
         sh "oc set image dc/${parksmap} ${parksmap}=docker-registry.default.svc:5000/${devNamespace}/${parksmap}:${devTag} -n ${devNamespace}"
         sh "oc delete configmap ${parksmap}-config --ignore-not-found=true -n ${devNamespace}"
-        sh "oc create configmap ${parksmap}-config --from-file=configuration/application-users.properties --from-file=configuration/application-roles.properties --from-file=./configuration/${parksmap}.properties -n ${devNamespace}"
+        sh "oc create configmap ${parksmap}-config --from-file=configuration/application-users.properties --from-file=configuration/application-roles.properties --from-literal='APPNAME=ParksMap (Dev)' -n ${devNamespace}"
 
         openshiftDeploy apiURL: apiUrl, depCfg: "${parksmap}", namespace: devNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
         openshiftVerifyDeployment apiURL: apiUrl, depCfg: "${parksmap}", namespace: devNamespace, replicaCount: '', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
@@ -116,7 +116,11 @@ podTemplate(
 
         // Update the Config Map which contains the users for the Parks application
         sh "oc delete configmap ${destApp}-config -n ${prodNamespace} --ignore-not-found=true"
-        sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties -n ${prodNamespace}"
+        if (destApp == "${parksmap}-blue") {
+            sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties --from-literal='APPNAME=ParksMap (Blue)' -n ${prodNamespace}"
+        } else {
+            sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties --from-literal='APPNAME=ParksMap (Green)' -n ${prodNamespace}"
+        }
 
         // Deploy the active application.
         echo "Deploying " + activeApp

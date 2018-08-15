@@ -43,7 +43,7 @@ oc create -f ./Infrastructure/templates/jenkins/mlbparks_bc.yaml -n ${GUID}-jenk
 oc create -f ./Infrastructure/templates/jenkins/nationalparks_bc.yaml -n ${GUID}-jenkins
 oc create -f ./Infrastructure/templates/jenkins/parksmap_bc.yaml -n ${GUID}-jenkins
 
-oc set probe dc/jenkins -n $GUID-jenkins --readiness --failure-threshold 3 --initial-delay-seconds 300 --get-url=http://:8080/login
+oc set probe dc/jenkins -n $GUID-jenkins --readiness --failure-threshold 3 --initial-delay-seconds 500 --get-url=http://:8080/login
 
 # set environmental variables in build configs for pipeline: GUID, Cluster
 oc set env bc/mlbparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
