@@ -64,10 +64,11 @@ podTemplate(
         echo "Building OpenShift container image ${mlbparks}:${devTag}"
         sh "if [ ! -f ./${mlbparks}-${version}.jar ]; then wget ${nexusUrl}/repository/releases/com/openshift/evg/roadshow/${mlbparks}/${version}/${mlbparks}-${version}.war; fi"
         sh "oc start-build ${mlbparks} --from-file=./${mlbparks}-${version}.war -n ${devNamespace}"
-        openshiftVerifyBuild apiURL: apiUrl, bldCfg: ${mlbparks}, checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'               
+        //  http://nexus3-js-nexus.apps.na39.openshift.opentlc.com/repository/releases/com/openshift/evg/roadshow/mlbparks/1.0/mlbparks-1.0.war
+        openshiftVerifyBuild apiURL: apiUrl, bldCfg: mlbparks, checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'               
         sh "rm ./${mlbparks}-*.war"
         // // to tag the image
-        openshiftTag alias: 'false', apiURL: apiUrl, destStream: ${mlbparks}, destTag: devTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: ${mlbparks}, srcTag: 'latest', verbose: 'false'
+        openshiftTag alias: 'false', apiURL: apiUrl, destStream: mlbparks, destTag: devTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: mlbparks, srcTag: 'latest', verbose: 'false'
     }
     
     stage('Deploy to Dev') {
@@ -98,7 +99,7 @@ podTemplate(
     stage('Copy Image to Nexus Docker Registry') {
         echo "Copy image to Nexus Docker Registry"
         sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/${devNamespace}/${mlbparks}:${devTag} docker://nexus-registry.${GUID}-nexus.svc.cluster.local:5000/${mlbparks}:${devTag}"
-        openshiftTag alias: 'false', destStream: ${mlbparks}, destTag: prodTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: ${mlbparks}, srcTag: devTag, verbose: 'false'
+        openshiftTag alias: 'false', destStream: mlbparks, destTag: prodTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: mlbparks, srcTag: devTag, verbose: 'false'
     }
     
     def destApp = "${mlbparks}-green"

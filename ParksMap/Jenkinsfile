@@ -64,10 +64,10 @@ podTemplate(
         echo "Building OpenShift container image ${parksmap}:${devTag}"
         sh "if [ ! -f ./parksmap-${version}.jar ]; then wget ${nexusUrl}/repository/releases/com/openshift/evg/roadshow/parksmap/${version}/parksmap-${version}.jar; fi"
         sh "oc start-build ${parksmap} --from-file=./parksmap-${version}.jar -n ${devNamespace}"
-        openshiftVerifyBuild apiURL: apiUrl, bldCfg: ${parksmap}, checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'
+        openshiftVerifyBuild apiURL: apiUrl, bldCfg: parksmap, checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'
         sh "rm ./parksmap-*.jar"
         // // to tag the image
-        openshiftTag alias: 'false', apiURL: apiUrl, destStream: ${parksmap}, destTag: devTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: ${parksmap}, srcTag: 'latest', verbose: 'false'
+        openshiftTag alias: 'false', apiURL: apiUrl, destStream: parksmap, destTag: devTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: parksmap, srcTag: 'latest', verbose: 'false'
     }
     
     stage('Deploy to Dev') {
@@ -96,7 +96,7 @@ podTemplate(
     stage('Copy Image to Nexus Docker Registry') {
         echo "Copy image to Nexus Docker Registry"
         sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/${devNamespace}/${parksmap}:${devTag} docker://nexus-registry.${GUID}-nexus.svc.cluster.local:5000/${parksmap}:${devTag}"
-        openshiftTag alias: 'false', destStream: ${parksmap}, destTag: prodTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: ${parksmap}, srcTag: devTag, verbose: 'false'
+        openshiftTag alias: 'false', destStream: parksmap, destTag: prodTag, destinationNamespace: devNamespace, namespace: devNamespace, srcStream: parksmap, srcTag: devTag, verbose: 'false'
     }
     
     def destApp = "${parksmap}-green"
