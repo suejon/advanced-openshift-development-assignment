@@ -74,7 +74,7 @@ podTemplate(
         echo "Deploying container image to Development Project"
         sh "oc set image dc/${nationalparks} ${nationalparks}=docker-registry.default.svc:5000/${devNamespace}/${nationalparks}:${devTag} -n ${devNamespace}"
         sh "oc delete configmap ${nationalparks}-config --ignore-not-found=true -n ${devNamespace}"
-        sh "oc create configmap ${nationalparks}-config --from-file=configuration/application-users.properties --from-file=configuration/application-roles.properties -n ${devNamespace}"
+        sh "oc create configmap ${nationalparks}-config --from-file=configuration/application-users.properties --from-file=configuration/application-roles.properties --from-file=configuration/${nationalparks}.properties -n ${devNamespace}"
         sh "oc label svc ${nationalparks} type=parksmap-backend --overwrite -n ${devNamespace}"
 
         openshiftDeploy apiURL: apiUrl, depCfg: "${nationalparks}", namespace: devNamespace, verbose: 'false', waitTime: '', waitUnit: 'sec'
@@ -118,7 +118,7 @@ podTemplate(
 
         // Update the Config Map which contains the users for the Tasks application
         sh "oc delete configmap ${destApp}-config -n ${prodNamespace} --ignore-not-found=true"
-        sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties --from-file=./configuration/${nationalparks}.properties -n ${prodNamespace}"
+        sh "oc create configmap ${destApp}-config --from-file=./configuration/application-users.properties --from-file=./configuration/application-roles.properties -n ${prodNamespace}"
 
         // label the green app as the backend (need to delete the service and recreate + label the blue to refresh the cache)
         sh "oc label svc ${nationalparks}-green type=parksmap-backend --overwrite -n ${prodNamespace}"

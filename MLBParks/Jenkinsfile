@@ -64,7 +64,6 @@ podTemplate(
         echo "Building OpenShift container image ${mlbparks}:${devTag}"
         sh "if [ ! -f ./${mlbparks}-${version}.jar ]; then wget ${nexusUrl}/repository/releases/com/openshift/evg/roadshow/${mlbparks}/${version}/${mlbparks}-${version}.war; fi"
         sh "oc start-build ${mlbparks} --from-file=./${mlbparks}-${version}.war -n ${devNamespace}"
-        //  http://nexus3-js-nexus.apps.na39.openshift.opentlc.com/repository/releases/com/openshift/evg/roadshow/mlbparks/1.0/mlbparks-1.0.war
         openshiftVerifyBuild apiURL: apiUrl, bldCfg: mlbparks, checkForTriggeredDeployments: 'false', namespace: devNamespace, verbose: 'false', waitTime: '600000'               
         sh "rm ./${mlbparks}-*.war"
         // // to tag the image
