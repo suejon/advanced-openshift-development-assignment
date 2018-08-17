@@ -36,7 +36,7 @@ oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n $
 
 
 oc new-app jenkins-persistent --name jenkins --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
-oc patch dc jenkins --patch='{ "spec": { "strategy": { "recreateParams": { "timeoutSeconds": 900}}}}' -n ${GUID}-jenkins
+oc patch dc jenkins --patch='{ "spec": { "strategy": { "recreateParams": { "timeoutSeconds": 1200}}}}' -n ${GUID}-jenkins
 # create jenkins slave image with skopeo
 cat ./Infrastructure/templates/jenkins/Dockerfile | oc new-build --dockerfile=- --name=jenkins-slave-maven-appdev -n ${GUID}-jenkins
 
