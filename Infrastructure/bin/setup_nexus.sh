@@ -31,6 +31,10 @@ echo "Setting up Nexus in project $GUID-nexus"
 # To be Implemented by Student
 oc new-app -f ./Infrastructure/templates/nexus/nexus_template.yaml -n ${GUID}-nexus
 
+# allow gading pipeline to edit + delete projects
+oc policy add-role-to-user edit system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-nexus
+oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-nexus
+
 # remount nexus to the PVC
 oc set volume dc/nexus3 --add --overwrite --name=nexus3-volume-1 --mount-path=/nexus-data/ --type persistentVolumeClaim --claim-name=nexus-pvc -n ${GUID}-nexus
 

@@ -18,8 +18,11 @@ echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 # To be Implemented by Student
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${GUID}-parks-prod -n ${GUID}-parks-dev
 oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-parks-prod
-oc policy add-role-to-user edit system:serviceaccount:gpte-jenkins:jenkins -n js-parks-prod
 oc policy add-role-to-user view --serviceaccount=default -n ${GUID}-parks-prod
+
+# allow gading pipeline to edit + delete projects
+oc policy add-role-to-user edit system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-parks-prod
+oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-parks-prod
 
 # spin up mongo db via stateful set
 oc new-app -f ./Infrastructure/templates/parks-prod/mongodb_services.yaml -n ${GUID}-parks-prod
@@ -35,6 +38,7 @@ sleep 10
 ## MLB Parks
 ### Blue
 oc new-app ${GUID}-parks-dev/${MlbParks}:0.0 --name=${MlbParks}-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc patch dc ${MlbParks}-blue --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/${MlbParks}-blue --remove-all -n ${GUID}-parks-prod
 oc expose dc ${MlbParks}-blue --port 8080 -n ${GUID}-parks-prod
 oc create configmap ${MlbParks}-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Blue)" -n ${GUID}-parks-prod
@@ -42,6 +46,7 @@ oc set volume dc/${MlbParks}-blue --add --name=jboss-config --mount-path=/opt/ea
 oc set volume dc/${MlbParks}-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${MlbParks}-blue-config -n ${GUID}-parks-prod
 ### Green
 oc new-app ${GUID}-parks-dev/${MlbParks}:0.0 --name=${MlbParks}-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc patch dc ${MlbParks}-green --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/${MlbParks}-green --remove-all -n ${GUID}-parks-prod
 oc expose dc ${MlbParks}-green --port 8080 -n ${GUID}-parks-prod
 oc create configmap ${MlbParks}-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=MLB Parks (Green)" -n ${GUID}-parks-prod
@@ -51,6 +56,7 @@ oc set volume dc/${MlbParks}-green --add --name=jboss-config1 --mount-path=/opt/
 ## National Parks
 ### Blue
 oc new-app ${GUID}-parks-dev/${NationalParks}:0.0 --name=${NationalParks}-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc patch dc ${NationalParks}-blue --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/${NationalParks}-blue --remove-all -n ${GUID}-parks-prod
 oc expose dc ${NationalParks}-blue --port 8080 -n ${GUID}-parks-prod
 oc create configmap ${NationalParks}-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Blue)" -n ${GUID}-parks-prod
@@ -58,6 +64,7 @@ oc set volume dc/${NationalParks}-blue --add --name=jboss-config --mount-path=/o
 oc set volume dc/${NationalParks}-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${NationalParks}-blue-config -n ${GUID}-parks-prod
 ### Green
 oc new-app ${GUID}-parks-dev/${NationalParks}:0.0 --name=${NationalParks}-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc patch dc ${NationalParks}-green --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/${NationalParks}-green --remove-all -n ${GUID}-parks-prod
 oc expose dc ${NationalParks}-green --port 8080 -n ${GUID}-parks-prod
 oc create configmap ${NationalParks}-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=National Parks (Green)" -n ${GUID}-parks-prod
@@ -67,6 +74,7 @@ oc set volume dc/${NationalParks}-green --add --name=jboss-config1 --mount-path=
 ## ParksMap
 ### Blue
 oc new-app ${GUID}-parks-dev/${ParksMap}:0.0 --name=${ParksMap}-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc patch dc ${ParksMap}-blue --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/${ParksMap}-blue --remove-all -n ${GUID}-parks-prod
 oc expose dc ${ParksMap}-blue --port 8080 -n ${GUID}-parks-prod
 oc create configmap ${ParksMap}-blue-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Blue)" -n ${GUID}-parks-prod
@@ -74,6 +82,7 @@ oc set volume dc/${ParksMap}-blue --add --name=jboss-config --mount-path=/opt/ea
 oc set volume dc/${ParksMap}-blue --add --name=jboss-config1 --mount-path=/opt/eap/standalone/configuration/application-roles.properties --sub-path=application-roles.properties --configmap-name=${ParksMap}-blue-config -n ${GUID}-parks-prod
 ### Green
 oc new-app ${GUID}-parks-dev/${ParksMap}:0.0 --name=${ParksMap}-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc patch dc ${ParksMap}-green --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/${ParksMap}-green --remove-all -n ${GUID}-parks-prod
 oc expose dc ${ParksMap}-green --port 8080 -n ${GUID}-parks-prod
 oc create configmap ${ParksMap}-green-config --from-literal="application-users.properties=Placeholder" --from-literal="application-roles.properties=Placeholder" --from-literal="APPNAME=ParksMap (Green)" -n ${GUID}-parks-prod

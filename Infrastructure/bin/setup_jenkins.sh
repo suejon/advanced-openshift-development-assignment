@@ -30,8 +30,10 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 
 # create objects
 
-# permissions for the grading pipeline to create build configs
+# permissions for the grading pipeline to create build configs / delete project
 oc policy add-role-to-user edit system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-jenkins
+oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-jenkins
+
 
 oc new-app jenkins-persistent --name jenkins --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
 

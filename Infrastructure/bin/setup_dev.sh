@@ -21,6 +21,10 @@ echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
 oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-parks-dev
 oc policy add-role-to-user view --serviceaccount=default -n ${GUID}-parks-dev
 
+# allow gading pipeline to edit + delete projects
+oc policy add-role-to-user edit system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-parks-dev
+oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-parks-dev
+
 oc new-app -f ./Infrastructure/templates/parks-dev/mongodb_services.yaml -n ${GUID}-parks-dev
 oc create -f ./Infrastructure/templates/parks-dev/mongodb_statefulset.yaml -n ${GUID}-parks-dev
 
