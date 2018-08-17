@@ -36,7 +36,7 @@ oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n $
 
 
 oc new-app jenkins-persistent --name jenkins --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
-oc patch dc jenkins --patch='{ "spec": { "strategy": { "recreateParams": { "timeoutSeconds": 1200}}}}' -n ${GUID}-jenkins
+oc patch dc jenkins --patch='{ "spec": { "strategy": { "recreateParams": { "timeoutSeconds": 1800}}}}' -n ${GUID}-jenkins
 # create jenkins slave image with skopeo
 cat ./Infrastructure/templates/jenkins/Dockerfile | oc new-build --dockerfile=- --name=jenkins-slave-maven-appdev -n ${GUID}-jenkins
 
@@ -45,7 +45,7 @@ oc create -f ./Infrastructure/templates/jenkins/mlbparks_bc.yaml -n ${GUID}-jenk
 oc create -f ./Infrastructure/templates/jenkins/nationalparks_bc.yaml -n ${GUID}-jenkins
 oc create -f ./Infrastructure/templates/jenkins/parksmap_bc.yaml -n ${GUID}-jenkins
 
-oc set probe dc/jenkins -n $GUID-jenkins --readiness --failure-threshold 3 --initial-delay-seconds 180 --get-url=http://:8080/login 
+oc set probe dc/jenkins -n $GUID-jenkins --readiness --failure-threshold 3 --initial-delay-seconds 360 --get-url=http://:8080/login 
 
 # set environmental variables in build configs for pipeline: GUID, Cluster
 oc set env bc/mlbparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
