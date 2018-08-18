@@ -90,15 +90,6 @@ objects:
     test: false
     triggers:
     - type: ConfigChange
-    # - imageChangeParams:
-    #     automatic: true
-    #     containerNames:
-    #     - nexus3
-    #     from:
-    #       kind: ImageStreamTag
-    #       name: nexus3:latest
-    #       namespace: js-nexus
-    #   type: ImageChange
   status:
     availableReplicas: 0
     latestVersion: 0
